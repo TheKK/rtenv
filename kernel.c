@@ -166,7 +166,7 @@ struct user_thread_stack {
 	unsigned int stack[STACK_SIZE - 18];
 };
 
-/* Task Control Block */
+/* Task Control Block */		//Comment: Use linked list to store process status?
 struct task_control_block {
     struct user_thread_stack *stack;
     int pid;
@@ -745,7 +745,8 @@ void show_echo(int argc, char* argv[])
 
 void here_i_hack(int argc, char *argv[])
 {
-
+	write(fdout, "test", 5);
+	write(fdout, next_line, 3);
 }
 
 //man
@@ -770,6 +771,7 @@ void show_man_page(int argc, char *argv[])
 	write(fdout, next_line, 3);
 }
 
+//history
 void show_history(int argc, char *argv[])
 {
 	int i;
@@ -805,10 +807,10 @@ void first()
 
 	setpriority(0, PRIORITY_LIMIT);
 
-	while(1);
+	while(1);									//Comment: They made "first" as a new thread?
 }
 
-struct pipe_ringbuffer {
+struct pipe_ringbuffer {								//Comment: Can't figure out what this used for.
 	int start;
 	int end;
 	char data[PIPE_BUF];
@@ -857,7 +859,7 @@ unsigned int *init_task(unsigned int *stack, void (*start)())
 }
 
 int
-task_push (struct task_control_block **list, struct task_control_block *item)
+task_push (struct task_control_block **list, struct task_control_block *item)		//Comment: PCB operators
 {
 	if (list && item) {
 		/* Remove itself from original list */
@@ -1104,7 +1106,7 @@ int main()
 	unsigned int stacks[TASK_LIMIT][STACK_SIZE];
 	//struct task_control_block tasks[TASK_LIMIT];
 	struct pipe_ringbuffer pipes[PIPE_LIMIT];
-	struct task_control_block *ready_list[PRIORITY_LIMIT + 1];  /* [0 ... 39] */
+	struct task_control_block *ready_list[PRIORITY_LIMIT + 1];  /* [0 ... 39] */	//Comment: "task_control_block" store process status
 	struct task_control_block *wait_list = NULL;
 	//size_t task_count = 0;
 	size_t current_task = 0;
@@ -1118,8 +1120,8 @@ int main()
 	init_rs232();
 	__enable_irq();
 
-	tasks[task_count].stack = (void*)init_task(stacks[task_count], &first);
-	tasks[task_count].pid = 0;
+	tasks[task_count].stack = (void*)init_task(stacks[task_count], &first);		//Comment: "tasks" is a list of "task_control_block"
+	tasks[task_count].pid = 0;							//Comment: "first" is the first process running, to build the shell
 	tasks[task_count].priority = PRIORITY_DEFAULT;
 	task_count++;
 
@@ -1245,7 +1247,7 @@ int main()
 		}
 
 		/* Put waken tasks in ready list */
-		for (task = wait_list; task != NULL;) {
+ 		for (task = wait_list; task != NULL;) {				//Comment: "task" and "wait_list" are both pointer of "task_control_block"
 			struct task_control_block *next = task->next;
 			if (task->status == TASK_READY)
 				task_push(&ready_list[task->priority], task);
