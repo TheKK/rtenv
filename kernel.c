@@ -172,7 +172,7 @@ struct task_control_block {
     int pid;
     int status;
     int priority;
-    struct task_control_block **prev;
+    struct task_control_block *prev;
     struct task_control_block  *next;
 };
 struct task_control_block tasks[TASK_LIMIT];
@@ -864,13 +864,13 @@ task_push (struct task_control_block **list, struct task_control_block *item)		/
 	if (list && item) {
 		/* Remove itself from original list */
 		if (item->prev)
-			*(item->prev) = item->next;
+			item->prev = item->next;
 		if (item->next)
 			item->next->prev = item->prev;
 		/* Insert into new list */
 		while (*list) list = &((*list)->next);
 		*list = item;
-		item->prev = list;
+		item->prev = (*list);
 		item->next = NULL;
 		return 0;
 	}
@@ -885,7 +885,7 @@ task_pop (struct task_control_block **list)
 		if (item) {
 			*list = item->next;
 			if (item->next)
-				item->next->prev = list;
+				item->next->prev = (*list);
 			item->prev = NULL;
 			item->next = NULL;
 			return item;
