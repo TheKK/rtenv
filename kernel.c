@@ -18,7 +18,7 @@ int strcmp(const char *a, const char *b)
         "   it      hi              \n"
         "   cmphi   r2, r3          \n"
         "   beq     strcmp_lop      \n"
-		"	sub     r0, r2, r3  	\n"
+	"   sub     r0, r2, r3      \n"
         "   bx      lr              \n"
 		:::
 	);
@@ -155,7 +155,7 @@ struct user_thread_stack {
 	unsigned int fp;
 	unsigned int _lr;	/* Back to system calls or return exception */
 	unsigned int _r7;	/* Backup from isr */
-	unsigned int r0;
+	unsigned int r0;	/* For return value */
 	unsigned int r1;
 	unsigned int r2;
 	unsigned int r3;
@@ -168,7 +168,7 @@ struct user_thread_stack {
 
 /* Task Control Block */		//Comment: Use linked list to store process status?
 struct task_control_block {
-    struct user_thread_stack *stack;
+    struct user_thread_stack *stack;	//Comment: Used for storing
     int pid;
     int status;
     int priority;
@@ -743,9 +743,34 @@ void show_echo(int argc, char* argv[])
 		write(fdout, next_line, 3);
 }
 
+///MY HACK GARDEN
+int c_strlen(char *s)
+{
+	char *p = s;
+
+	while(*p != '\0' )
+		p++;
+
+	return (p - s);
+}
+
 void here_i_hack(int argc, char *argv[])
 {
-	write(fdout, "test", 5);
+	char str[10];
+
+	write(fdout, "Text output: test", 18);
+	write(fdout, next_line, 3);
+	
+	write(fdout, "strlen(test): ", 15);
+	int len = strlen("test");
+	itoa(len, str, 10);
+	write(fdout, str, 2);
+	write(fdout, next_line, 3);
+
+	write(fdout, "c_strlen(test): ", 17);
+	len = c_strlen("test");
+	itoa(len, str, 10);
+	write(fdout, str, 2);
 	write(fdout, next_line, 3);
 }
 
@@ -854,7 +879,7 @@ struct pipe_ringbuffer {								//Comment: Can't figure out what this used for.
 unsigned int *init_task(unsigned int *stack, void (*start)())
 {
 	stack += STACK_SIZE - 9; /* End of stack, minus what we're about to push */
-	stack[8] = (unsigned int)start;
+	stack[8] = (unsigned int)start;							//Comment: stack[8] == 
 	return stack;
 }
 
@@ -1120,7 +1145,7 @@ int main()
 	init_rs232();
 	__enable_irq();
 
-	tasks[task_count].stack = (void*)init_task(stacks[task_count], &first);		//Comment: "tasks" is a list of "task_control_block"
+	tasks[task_count].stack = (void*)init_task(stacks[task_count], &first);		//Comment: "tasks" is a list of "task_control_block", And asve the address of "first" into stack
 	tasks[task_count].pid = 0;							//Comment: "first" is the first process running, to build the shell
 	tasks[task_count].priority = PRIORITY_DEFAULT;
 	task_count++;
@@ -1253,8 +1278,10 @@ int main()
 				task_push(&ready_list[task->priority], task);
 			task = next;
 		}
+
 		/* Select next TASK_READY task */
 		for (i = 0; i < (size_t)tasks[current_task].priority && ready_list[i] == NULL; i++);
+
 		if (tasks[current_task].status == TASK_READY) {
 			if (!timeup && i == (size_t)tasks[current_task].priority)
 				/* Current task has highest priority and remains execution time */
@@ -1265,6 +1292,7 @@ int main()
 		else {
 			task_push(&wait_list, &tasks[current_task]);
 		}
+
 		while (ready_list[i] == NULL)
 			i++;
 		current_task = task_pop(&ready_list[i])->pid;
