@@ -48,6 +48,9 @@ main.bin: kernel.c context_switch.s syscall.s syscall.h
 qemu: main.bin $(QEMU_STM32)
 	$(QEMU_STM32) -M stm32-p103 -kernel main.bin
 
+qemu_ng: main.bin $(QEMU_STM32)
+	$(QEMU_STM32) -nographic -M stm32-p103 -kernel main.bin
+
 qemudbg: main.bin $(QEMU_STM32)
 	$(QEMU_STM32) -M stm32-p103 \
 		-gdb tcp::3333 -S \
