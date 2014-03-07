@@ -92,5 +92,8 @@ qemuauto_remote: main.bin gdbscript
 	$(CROSS_COMPILE)gdb -x gdbscript&
 	sleep 5
 
+cowsay:
+	@cowsay hello
+
 clean:
 	rm -f *.elf *.bin *.list
