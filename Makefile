@@ -95,5 +95,6 @@ qemuauto_remote: main.bin gdbscript
 cowsay:
 	@cowsay hello
 
+.PHONY: clean
 clean:
 	rm -f *.elf *.bin *.list
