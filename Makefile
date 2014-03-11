@@ -40,6 +40,7 @@ main.bin: kernel.c context_switch.s syscall.s syscall.h
 		context_switch.s \
 		syscall.s \
 		stm32_p103.c \
+		unit_test.c \
 		kernel.c \
 		memcpy.s
 	$(CROSS_COMPILE)objcopy -Obinary main.elf main.bin
@@ -51,12 +52,14 @@ qemu: main.bin $(QEMU_STM32)
 qemu_ng: main.bin $(QEMU_STM32)
 	$(QEMU_STM32) -nographic -M stm32-p103 -kernel main.bin
 
-qemudbg: main.bin $(QEMU_STM32)
+qemudbg: unit_test.c unit_test.h
+	$(MAKE) main.bin DEBUG_FLAGS=-DDEBUG
 	$(QEMU_STM32) -M stm32-p103 \
 		-gdb tcp::3333 -S \
 		-kernel main.bin
 
-qemudbg_ng: main.bin $(QEMU_STM32)
+qemudbg_ng: unit_test.c unit_test.h
+	$(MAKE) main.bin DEBUG_FLAGS=-DDEBUG
 	$(QEMU_STM32) -nographic -M stm32-p103 \
 		-gdb tcp::3333 -S \
 		-kernel main.bin
