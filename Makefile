@@ -99,12 +99,12 @@ qemuauto_remote: main.bin gdbscript
 	$(CROSS_COMPILE)gdb -x gdbscript&
 	sleep 5
 
-check: unit_test.c unit_test.h
+check:
 	$(MAKE) main.bin DEBUG_FLAGS=-DDEBUG
 	$(QEMU_STM32) -nographic -M stm32-p103 \
 		-gdb tcp::3333 -S \
 		-serial stdio \
-		-kernel main.bin -monitor null >/dev/null &
+		-kernel main.bin -monitor null > /dev/null &
 	@echo
 	$(CROSS_COMPILE)gdb -batch -x test-strlen.in
 	@mv -f gdb.txt test-strlen.txt
