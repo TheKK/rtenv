@@ -2,7 +2,6 @@
 #include "RTOSConfig.h"
 
 #include "syscall.h"
-#include "kernel.h"
 
 #include <stddef.h>
 
@@ -67,14 +66,14 @@ void puts(char *s)
 	}
 }
 
-/*#define MAX_CMDNAME 19*/
-/*#define MAX_ARGC 19*/
-/*#define MAX_CMDHELP 1023*/
-/*#define HISTORY_COUNT 20*/
-/*#define CMDBUF_SIZE 100*/
-/*#define MAX_ENVCOUNT 30*/
-/*#define MAX_ENVNAME 15*/
-/*#define MAX_ENVVALUE 127*/
+#define MAX_CMDNAME 19
+#define MAX_ARGC 19
+#define MAX_CMDHELP 1023
+#define HISTORY_COUNT 20
+#define CMDBUF_SIZE 100
+#define MAX_ENVCOUNT 30
+#define MAX_ENVNAME 15
+#define MAX_ENVVALUE 127
 
 #define STACK_SIZE 512 /* Size of task stacks in words */
 #define TASK_LIMIT 8  /* Max number of tasks we can handle */
@@ -117,7 +116,7 @@ void show_history(int argc, char *argv[]);
 void here_i_hack(int argc, char *argv[]);
 
 /* Enumeration for command types. */
-/*enum {
+enum {
 	CMD_ECHO = 0,
 	CMD_EXPORT,
 	CMD_HELP,
@@ -126,7 +125,7 @@ void here_i_hack(int argc, char *argv[]);
 	CMD_PS,
 	CMD_HACK,
 	CMD_COUNT
-} CMD_TYPE;*/
+} CMD_TYPE;
 
 /* Structure for command handler. */
 typedef struct {
@@ -134,6 +133,7 @@ typedef struct {
 	void (*func)(int, char**);
 	char description[MAX_CMDHELP + 1];
 } hcmd_entry;
+
 const hcmd_entry cmd_data[CMD_COUNT] = {
 	[CMD_ECHO] = {.cmd = "echo", .func = show_echo, .description = "Show words you input."},
 	[CMD_EXPORT] = {.cmd = "export", .func = export_envvar, .description = "Export environment variables."},
@@ -145,10 +145,10 @@ const hcmd_entry cmd_data[CMD_COUNT] = {
 };
 
 /* Structure for environment variables. */
-/*typedef struct {
+typedef struct {
 	char name[MAX_ENVNAME + 1];
 	char value[MAX_ENVVALUE + 1];
-} evar_entry;*/
+} evar_entry;
 
 evar_entry env_var[MAX_ENVCOUNT];
 int env_count = 0;
