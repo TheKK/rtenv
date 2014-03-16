@@ -47,7 +47,7 @@ main.bin: kernel.c context_switch.s syscall.s syscall.h
 	$(CROSS_COMPILE)objdump -S main.elf > main.list
 
 qemu: main.bin $(QEMU_STM32)
-	$(QEMU_STM32) -M stm32-p103 -kernel main.bin
+	$(QEMU_STM32) -M stm32-p103 -monitor stdio -kernel main.bin
 
 qemu_ng: main.bin $(QEMU_STM32)
 	$(QEMU_STM32) -nographic -M stm32-p103 -kernel main.bin
@@ -56,6 +56,7 @@ qemudbg: unit_test.c unit_test.h
 	$(MAKE) main.bin DEBUG_FLAGS=-DDEBUG
 	$(QEMU_STM32) -M stm32-p103 \
 		-gdb tcp::3333 -S \
+		-monitor stdio \
 		-kernel main.bin
 
 qemudbg_ng: unit_test.c unit_test.h
@@ -138,8 +139,8 @@ check:
 	@echo
 	@pkill -9 $(notdir $(QEMU_STM32))
 
-cowsay:
-	@cowsay hello
+color:
+	@echo -e '\x1b[31;01m hi'
 
 .PHONY: clean
 clean:
